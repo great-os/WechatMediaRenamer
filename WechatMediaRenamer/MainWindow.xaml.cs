@@ -49,10 +49,18 @@ namespace WechatMediaRenamer
         {
             MediaFileRenamer mediaFileRenamer;
             StringBuilder sb = new StringBuilder();
+            string renameMessage;
             foreach (var filePath in files)
             {
                 mediaFileRenamer = MediaFileRenamer.FromFilePath(filePath);
-                string renameMessage = mediaFileRenamer.Rename();
+                if (!(cbShotAt.IsChecked ?? false))
+                {
+                    renameMessage = mediaFileRenamer.Rename();
+                }
+                else
+                {
+                    renameMessage = mediaFileRenamer.Rename(true);
+                }
                 if (renameMessage.Length > 0)
                 {
                     sb.AppendLine(renameMessage);

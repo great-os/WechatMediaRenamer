@@ -6,15 +6,20 @@
         xmlns:local="clr-namespace:WechatMediaRenamer"
         mc:Ignorable="d"
         Topmost="True"
-        Title="微信图重命名神器" Height="150" Width="300" Icon="binoculars.png">
+        Title="微信图重命名神器" Height="200" Width="300" Icon="binoculars.png">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="34" />
             <RowDefinition Height="34" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Button Grid.Row="0" Content="Close" HorizontalAlignment="Stretch"
                 Margin="5" VerticalAlignment="Stretch" Click="Button_Click"/>
-        <Label Grid.Row="1" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Orientation="Horizontal">
+            <CheckBox x:Name="cbShotAt" VerticalAlignment="Center" HorizontalAlignment="Left" Content="拍摄日期"/>
+        </StackPanel>
+        <Label Grid.Row="2" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
                VerticalAlignment="Stretch" VerticalContentAlignment="Center" Margin="5" BorderBrush="#FF3E3535"
                BorderThickness="1" Drop="Ellipse_Drop" AllowDrop="True"/>
     </Grid>

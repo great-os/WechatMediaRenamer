@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace WechatMediaRenamer
 {
-    class MediaFileRenamer
+    internal class MediaFileRenamer
     {
         public string FullFilePath { get; }
         public string FullDirectoryPath { get; }
@@ -18,6 +17,7 @@ namespace WechatMediaRenamer
         private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly TimeSpan chinaTimeSpan = new TimeSpan(8, 0, 0);
         private static readonly TimeZoneInfo chinaTime = TimeZoneInfo.CreateCustomTimeZone("CST", chinaTimeSpan, "China Standard SR Time", "SR Time");
+        private static Regex r = new Regex(":");
 
         public static MediaFileRenamer FromFilePath(string filePath)
         {
@@ -26,20 +26,64 @@ namespace WechatMediaRenamer
 
         public MediaFileRenamer(string filePath)
         {
-            this.FullFilePath = filePath;
-            this.FullDirectoryPath = Path.GetDirectoryName(filePath);
-            this.FileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
-            this.Extension = Path.GetExtension(filePath);
+            FullFilePath = filePath;
+            FullDirectoryPath = Path.GetDirectoryName(filePath);
+            FileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            Extension = Path.GetExtension(filePath);
         }
 
         public string Rename()
         {
-            string epochTime = GetDatePart(this.FileNameWithoutExtension);
-            if (epochTime.Equals(String.Empty) || epochTime.Length != 13)
+            string epochTime = GetDatePart(FileNameWithoutExtension);
+            if (epochTime.Equals(string.Empty) || epochTime.Length != 13)
             {
-                return String.Format("无法识别文件 '{0}'中的Epoch时间！", this.FullFilePath);
+                return string.Format("无法识别文件 '{0}'中的Epoch时间！", FullFilePath);
             }
-            string destPath = Path.Combine(this.FullDirectoryPath, ComposeNameFromEpochTime(epochTime));
+            return RenameByDateTime(GetDateTimeInChinaFromEpochTime(epochTime));
+        }
+
+        public string Rename(bool useShotTime)
+        {
+            if (!useShotTime)
+            {
+                return Rename();
+            }
+            DateTime? shotAt = GetShotDate();
+            if (shotAt == null)
+            {
+                return string.Format("'{0}' 不存在拍摄日期！", FullFilePath);
+            }
+            return RenameByDateTime((DateTime)shotAt);
+        }
+
+        private DateTime? GetShotDate()
+        {
+            using (FileStream fs = new FileStream(FullFilePath, FileMode.Open, FileAccess.Read))
+            using (Image myImage = Image.FromStream(fs, false, false))
+            {
+                try
+                {
+                    PropertyItem propItem = myImage.GetPropertyItem(0x9003);
+                    string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
+                    if (dateTaken.Length == 0)
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        return DateTime.Parse(dateTaken);
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+        }
+
+        private string RenameByDateTime(DateTime dateTime)
+        {
+            string destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime));
             if (File.Exists(destPath))
             {
                 return String.Format("'{0}' 无法被重命名为 '{1}'，因为目标已存在！", this.FullFilePath, destPath);
@@ -73,11 +117,11 @@ namespace WechatMediaRenamer
             }
         }
 
-        private string ComposeNameFromEpochTime(string epochTime)
+        private string ComposeNameFromEpochTime(DateTime dateTime)
         {
-            string dateTimePart = String.Format("{0:yyyyMMdd_HHmmss}", GetDateTimeInChinaFromEpochTime(epochTime));
-            string fileNameTemplate = GetFileNameTemplateByExtention(this.Extension);
-            return String.Format(fileNameTemplate, dateTimePart, this.Extension);
+            string dateTimePart = string.Format("{0:yyyyMMdd_HHmmss}", dateTime);
+            string fileNameTemplate = GetFileNameTemplateByExtention(Extension);
+            return string.Format(fileNameTemplate, dateTimePart, Extension);
         }
 
         private DateTime GetDateTimeInChinaFromEpochTime(string epochTime)
