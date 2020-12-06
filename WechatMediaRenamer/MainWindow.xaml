@@ -19,7 +19,7 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Orientation="Horizontal">
             <CheckBox x:Name="cbShotAt" VerticalAlignment="Center" HorizontalAlignment="Left" Content="拍摄日期"/>
         </StackPanel>
-        <Label Grid.Row="2" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
+        <Label x:Name="lbDrop" Grid.Row="2" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
                VerticalAlignment="Stretch" VerticalContentAlignment="Center" Margin="5" BorderBrush="#FF3E3535"
                BorderThickness="1" Drop="Ellipse_Drop" AllowDrop="True"/>
     </Grid>

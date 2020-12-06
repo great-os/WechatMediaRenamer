@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace WechatMediaRenamer
 {
@@ -21,10 +22,8 @@ namespace WechatMediaRenamer
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        private static readonly TimeSpan chinaTimeSpan = new TimeSpan(8, 0, 0);
-        private static readonly TimeZoneInfo chinaTime = TimeZoneInfo.CreateCustomTimeZone("CST", chinaTimeSpan, "China Standard SR Time", "SR Time");
+        private string[] files;
+        private bool useShotAt;
 
         public MainWindow()
         {
@@ -41,19 +40,24 @@ namespace WechatMediaRenamer
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                RenameFiles(files);
+                useShotAt = cbShotAt.IsChecked ?? false;
+                this.files = files;
+                new Thread(new ThreadStart(RenameFiles)).Start();
             }
         }
 
-        private void RenameFiles(string[] files)
+        public void RenameFiles()
         {
             MediaFileRenamer mediaFileRenamer;
             StringBuilder sb = new StringBuilder();
-            string renameMessage;
+            string renameMessage, originalContent = lbDrop.Dispatcher.Invoke(() => lbDrop.Content.ToString());
+            int count = 0;
             foreach (var filePath in files)
             {
                 mediaFileRenamer = MediaFileRenamer.FromFilePath(filePath);
-                if (!(cbShotAt.IsChecked ?? false))
+                count++;
+                Dispatcher.Invoke(() => lbDrop.Content = string.Format("Processing {0}/{1}", count, files.Length));
+                if (!useShotAt)
                 {
                     renameMessage = mediaFileRenamer.Rename();
                 }
@@ -68,8 +72,9 @@ namespace WechatMediaRenamer
             }
             if (sb.Length > 0)
             {
-                MessageBox.Show(sb.ToString());
+                Dispatcher.Invoke(() => MessageBox.Show(sb.ToString()));
             }
+            Dispatcher.Invoke(() => lbDrop.Content = originalContent);
         }
     }
 }
