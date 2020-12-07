@@ -16,8 +16,11 @@
         <Button Grid.Row="0" Content="Close" HorizontalAlignment="Stretch"
                 Margin="5" VerticalAlignment="Stretch" Click="Button_Click"/>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Orientation="Horizontal">
-            <CheckBox x:Name="cbShotAt" VerticalAlignment="Center" HorizontalAlignment="Left" Content="拍摄日期"/>
+        <StackPanel x:Name="modeSelector" Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Orientation="Horizontal">
+            <RadioButton x:Name="rbDefault" GroupName="CommandMode" VerticalAlignment="Center" HorizontalAlignment="Left" Content="默认" Checked="rbCommandMode_Checked" IsChecked="True" />
+            <RadioButton x:Name="rbShotAt" GroupName="CommandMode" VerticalAlignment="Center" HorizontalAlignment="Left" Content="拍摄日期" Checked="rbCommandMode_Checked" />
+            <RadioButton x:Name="rbCreatedAt" GroupName="CommandMode" VerticalAlignment="Center" HorizontalAlignment="Left" Content="创建日期" Checked="rbCommandMode_Checked" />
+            <RadioButton x:Name="rbUpdateAt" GroupName="CommandMode" VerticalAlignment="Center" HorizontalAlignment="Left" Content="修改日期" Checked="rbCommandMode_Checked" />
         </StackPanel>
         <Label x:Name="lbDrop" Grid.Row="2" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
                VerticalAlignment="Stretch" VerticalContentAlignment="Center" Margin="5" BorderBrush="#FF3E3535"

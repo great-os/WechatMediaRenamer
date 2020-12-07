@@ -42,18 +42,31 @@ namespace WechatMediaRenamer
             return RenameByDateTime(GetDateTimeInChinaFromEpochTime(epochTime));
         }
 
-        public string Rename(bool useShotTime)
+        public string RenameByShotAt()
         {
-            if (!useShotTime)
-            {
-                return Rename();
-            }
             DateTime? shotAt = GetShotDate();
             if (shotAt == null)
             {
                 return string.Format("'{0}' 不存在拍摄日期！", FullFilePath);
             }
             return RenameByDateTime((DateTime)shotAt);
+        }
+
+        public string Rename(ProcessMode processMode)
+        {
+            switch (processMode)
+            {
+                case ProcessMode.Default:
+                    return Rename();
+                case ProcessMode.ShotAt:
+                    return RenameByShotAt();
+                case ProcessMode.UpdatedAt:
+                    return RenameByDateTime(GetUpdatedAt());
+                case ProcessMode.CreatedAt:
+                    return RenameByDateTime(GetCreateAt());
+                default:
+                    return String.Empty;
+            }
         }
 
         private DateTime? GetShotDate()
@@ -79,6 +92,16 @@ namespace WechatMediaRenamer
                     return null;
                 }
             }
+        }
+
+        private DateTime GetCreateAt()
+        {
+            return File.GetCreationTime(FullFilePath);
+        }
+
+        private DateTime GetUpdatedAt()
+        {
+            return File.GetLastWriteTime(FullFilePath);
         }
 
         private string RenameByDateTime(DateTime dateTime)

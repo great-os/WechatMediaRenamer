@@ -23,7 +23,7 @@ namespace WechatMediaRenamer
     public partial class MainWindow : Window
     {
         private string[] files;
-        private bool useShotAt;
+        private ProcessMode processMode = ProcessMode.Default;
 
         public MainWindow()
         {
@@ -39,9 +39,7 @@ namespace WechatMediaRenamer
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                useShotAt = cbShotAt.IsChecked ?? false;
-                this.files = files;
+                this.files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 new Thread(new ThreadStart(RenameFiles)).Start();
             }
         }
@@ -57,14 +55,7 @@ namespace WechatMediaRenamer
                 mediaFileRenamer = MediaFileRenamer.FromFilePath(filePath);
                 count++;
                 Dispatcher.Invoke(() => lbDrop.Content = string.Format("Processing {0}/{1}", count, files.Length));
-                if (!useShotAt)
-                {
-                    renameMessage = mediaFileRenamer.Rename();
-                }
-                else
-                {
-                    renameMessage = mediaFileRenamer.Rename(true);
-                }
+                renameMessage = mediaFileRenamer.Rename(processMode);
                 if (renameMessage.Length > 0)
                 {
                     sb.AppendLine(renameMessage);
@@ -75,6 +66,28 @@ namespace WechatMediaRenamer
                 Dispatcher.Invoke(() => MessageBox.Show(sb.ToString()));
             }
             Dispatcher.Invoke(() => lbDrop.Content = originalContent);
+        }
+
+        private void rbCommandMode_Checked(object sender, RoutedEventArgs e)
+        {
+            RadioButton rb = (sender as RadioButton);
+            switch (rb.Name)
+            {
+                case "rbDefault":
+                    processMode = ProcessMode.Default;
+                    break;
+                case "rbShotAt":
+                    processMode = ProcessMode.ShotAt;
+                    break;
+                case "rbCreatedAt":
+                    processMode = ProcessMode.CreatedAt;
+                    break;
+                case "rbUpdateAt":
+                    processMode = ProcessMode.UpdatedAt;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
