@@ -119,7 +119,7 @@ namespace WechatMediaRenamer
 
         private string ComposeNameFromEpochTime(DateTime dateTime)
         {
-            string dateTimePart = string.Format("{0:yyyyMMdd_HHmmss}", dateTime);
+            string dateTimePart = string.Format("{0:yyyyMMdd_HHmmss_fff}", dateTime);
             string fileNameTemplate = GetFileNameTemplateByExtention(Extension);
             return string.Format(fileNameTemplate, dateTimePart, Extension);
         }
