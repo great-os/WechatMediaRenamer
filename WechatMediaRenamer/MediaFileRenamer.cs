@@ -139,6 +139,7 @@ namespace WechatMediaRenamer
                 case ".jpeg":
                 case ".png":
                 case ".gif":
+                case ".webp":
                     return "IMG_{0}{1}";
                 default:
                     return "{0}{1}";
