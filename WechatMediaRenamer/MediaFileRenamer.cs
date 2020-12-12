@@ -107,6 +107,11 @@ namespace WechatMediaRenamer
         private string RenameByDateTime(DateTime dateTime)
         {
             string destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime));
+            if (FullFilePath.Equals(destPath))
+            {
+                // 文件名未改变
+                return String.Empty;
+            }
             if (File.Exists(destPath))
             {
                 return String.Format("'{0}' 无法被重命名为 '{1}'，因为目标已存在！", this.FullFilePath, destPath);
