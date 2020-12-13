@@ -134,6 +134,8 @@ namespace WechatMediaRenamer
             switch (extName.ToLower())
             {
                 case ".mp4":
+                case ".avi":
+                case ".mov":
                     return "VID_{0}{1}";
                 case ".jpg":
                 case ".jpeg":
