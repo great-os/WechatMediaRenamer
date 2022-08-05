@@ -22,3 +22,7 @@
 ## 开源协议
 
 MIT
+
+## 主代码库
+
+https://gitee.com/greatbody/WechatMediaRenamer
