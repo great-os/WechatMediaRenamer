@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WechatMediaRenamer"
         mc:Ignorable="d"
         Topmost="True"
-        Title="微信图重命名神器" Height="200" Width="300" Icon="binoculars.png">
+        Title="微信图重命名神器" Height="250.836" Width="300" Icon="binoculars.png" MinHeight="200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="34" />
@@ -23,8 +23,10 @@
             <RadioButton x:Name="rbUpdateAt" GroupName="CommandMode" VerticalAlignment="Center" HorizontalAlignment="Left" Content="修改日期" Checked="rbCommandMode_Checked" />
         </StackPanel>
         <Label x:Name="lbDrop" Grid.Row="2" Content="Drop Here" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" 
-               VerticalAlignment="Stretch" VerticalContentAlignment="Center" Margin="5" BorderBrush="#FF3E3535"
-               BorderThickness="1" Drop="Ellipse_Drop" AllowDrop="True"/>
+               VerticalAlignment="Stretch" VerticalContentAlignment="Center" Margin="5,5,5,24" BorderBrush="#FF3E3535"
+               BorderThickness="1" Drop="Ellipse_Drop" AllowDrop="True" MinHeight="20"/>
+        <Label x:Name="lb52pojie" Grid.Row="2" Content="www.52pojie.cn" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+               VerticalAlignment="Bottom" VerticalContentAlignment="Center" Margin="5,5,0,0"/>
     </Grid>
 
 </Window>

@@ -23,11 +23,18 @@ namespace WechatMediaRenamer
     public partial class MainWindow : Window
     {
         private string[] files;
+        private System.Timers.Timer timer;
         private ProcessMode processMode = ProcessMode.Default;
 
         public MainWindow()
         {
             InitializeComponent();
+            this.timer = new System.Timers.Timer(1000);
+            timer.Elapsed += (sender, e) =>
+            {
+                Dispatcher.Invoke(() => { LabelColorChanger(); });
+            };
+            timer.Start();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -88,6 +95,12 @@ namespace WechatMediaRenamer
                 default:
                     break;
             }
+        }
+
+        private void LabelColorChanger()
+        {
+            Random rnd = new Random();
+            lb52pojie.Foreground = new SolidColorBrush(Color.FromRgb((byte)rnd.Next(1, 255), (byte)rnd.Next(1, 255), (byte)rnd.Next(1, 255)));
         }
     }
 }
