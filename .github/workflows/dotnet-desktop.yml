@@ -97,3 +97,10 @@ jobs:
         BuildMode: SideLoadOnly
         Configuration: Release
         TargetPlatform: ${{ matrix.targetplatform }}
+
+    # Upload the exe
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: Exe Package
+        path: WechatMediaRenamer\bin\Release\
