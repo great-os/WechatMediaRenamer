@@ -107,10 +107,11 @@ jobs:
         path: WechatMediaRenamer\bin\Release\
 
     - uses: "marvinpinto/action-automatic-releases@latest"
+      if: matrix.configuration == 'Release'
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         prerelease: true
         title: "Development Build"
         files: |
-          **/WechatMediaRenamer/bin/${{ matrix.configuration }}/*
+          **/WechatMediaRenamer/bin/Release/*
