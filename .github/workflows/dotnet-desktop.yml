@@ -113,4 +113,4 @@ jobs:
         prerelease: true
         title: "Development Build"
         files: |
-          WechatMediaRenamer\bin\Release\*
+          WechatMediaRenamer\bin\Release\
