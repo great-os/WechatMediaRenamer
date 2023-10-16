@@ -107,7 +107,7 @@ namespace WechatMediaRenamer
 
         private string RenameByDateTime(DateTime dateTime)
         {
-            string destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime));
+            string destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime, false));
             if (FullFilePath.Equals(destPath))
             {
                 // 文件名未改变
@@ -115,6 +115,12 @@ namespace WechatMediaRenamer
             }
             if (File.Exists(destPath))
             {
+                // try with miliseconds
+                destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime, true));
+            }
+            if (File.Exists(destPath))
+            {
+                // alert duplicate
                 return String.Format("'{0}' 无法被重命名为 '{1}'，因为目标已存在！", this.FullFilePath, destPath);
             }
             File.Move(this.FullFilePath, destPath);
@@ -149,9 +155,10 @@ namespace WechatMediaRenamer
             }
         }
 
-        private string ComposeNameFromEpochTime(DateTime dateTime)
+        private string ComposeNameFromEpochTime(DateTime dateTime, bool includeMiliseconds)
         {
-            string dateTimePart = string.Format("{0:yyyyMMdd_HHmmss_fff}", dateTime);
+            string template = includeMiliseconds ? "{0:yyyyMMdd_HHmmss_fff}" : "{0:yyyyMMdd_HHmmss}";
+            string dateTimePart = string.Format(template, dateTime);
             string fileNameTemplate = GetFileNameTemplateByExtention(Extension);
             return string.Format(fileNameTemplate, dateTimePart, Extension);
         }
