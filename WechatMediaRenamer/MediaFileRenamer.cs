@@ -76,7 +76,8 @@ namespace WechatMediaRenamer
             {
                 try
                 {
-                    PropertyItem propItem = myImage.GetPropertyItem(0x9003);
+                    // https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
+                    PropertyItem propItem = myImage.GetPropertyItem(0x9004);
                     string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
                     if (dateTaken.Length == 0)
                     {
