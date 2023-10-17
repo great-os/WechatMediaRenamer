@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Interop;
 
 namespace WechatMediaRenamer
 {
@@ -74,25 +75,24 @@ namespace WechatMediaRenamer
             using (FileStream fs = new FileStream(FullFilePath, FileMode.Open, FileAccess.Read))
             using (Image myImage = Image.FromStream(fs, false, false))
             {
-                try
-                {
-                    // https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
-                    PropertyItem propItem = myImage.GetPropertyItem(0x9004);
-                    string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
-                    if (dateTaken.Length == 0)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        return DateTime.Parse(dateTaken);
-                    }
-                }
-                catch (Exception)
+                // https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
+                string dateTaken = _GetDateStringFromProperty(myImage, 0x9004) ?? _GetDateStringFromProperty(myImage, 0x9003);
+                if (dateTaken.Length == 0)
                 {
                     return null;
                 }
+                else
+                {
+                    return DateTime.Parse(dateTaken);
+                }
             }
+        }
+
+        private string _GetDateStringFromProperty(Image image, int propertyId)
+        {
+            if (!Array.Exists(image.PropertyIdList, id => id == propertyId)) return "";
+            PropertyItem propItem = image.GetPropertyItem(propertyId);
+            return r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
         }
 
         private DateTime GetCreateAt()
