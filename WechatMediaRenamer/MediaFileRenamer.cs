@@ -77,7 +77,7 @@ namespace WechatMediaRenamer
             {
                 // https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
                 string dateTaken = _GetDateStringFromProperty(myImage, 0x9004) ?? _GetDateStringFromProperty(myImage, 0x9003);
-                if (dateTaken.Length == 0)
+                if (dateTaken == null || dateTaken.Length == 0)
                 {
                     return null;
                 }
@@ -90,7 +90,7 @@ namespace WechatMediaRenamer
 
         private string _GetDateStringFromProperty(Image image, int propertyId)
         {
-            if (!Array.Exists(image.PropertyIdList, id => id == propertyId)) return "";
+            if (!Array.Exists(image.PropertyIdList, id => id == propertyId)) return null;
             PropertyItem propItem = image.GetPropertyItem(propertyId);
             return r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
         }
