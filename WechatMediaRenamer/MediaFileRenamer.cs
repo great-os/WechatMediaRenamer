@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Interop;
+using MetadataExtractor;
+using System.Collections.Generic;
+using MetadataExtractor.Formats.Exif;
 
 namespace WechatMediaRenamer
 {
@@ -72,20 +75,24 @@ namespace WechatMediaRenamer
 
         private DateTime? GetShotDate()
         {
-            using (FileStream fs = new FileStream(FullFilePath, FileMode.Open, FileAccess.Read))
-            using (Image myImage = Image.FromStream(fs, false, false))
-            {
-                // https://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
-                string dateTaken = _GetDateStringFromProperty(myImage, 0x9004) ?? _GetDateStringFromProperty(myImage, 0x9003);
-                if (dateTaken == null || dateTaken.Length == 0)
+            DateTime? shotDate = null;
+            IEnumerable<MetadataExtractor.Directory> directories = ImageMetadataReader.ReadMetadata(FullFilePath);
+            foreach (var directory in directories)
+                if (directory is ExifSubIfdDirectory)
                 {
-                    return null;
+                    var subIfdDirectory = directory as ExifSubIfdDirectory;
+                    if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeOriginal))
+                    {
+                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTimeOriginal);
+                        break; // Exit the loop since we found the shot date
+                    }
+                    if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeDigitized))
+                    {
+                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTimeDigitized);
+                        break; // Exit the loop since we found the shot date
+                    }
                 }
-                else
-                {
-                    return DateTime.Parse(dateTaken);
-                }
-            }
+            return shotDate;
         }
 
         private string _GetDateStringFromProperty(Image image, int propertyId)
@@ -117,6 +124,11 @@ namespace WechatMediaRenamer
             {
                 // try with miliseconds
                 destPath = Path.Combine(FullDirectoryPath, ComposeNameFromEpochTime(dateTime, true));
+            }
+            if (FullFilePath.Equals(destPath))
+            {
+                // 文件名未改变
+                return String.Empty;
             }
             if (File.Exists(destPath))
             {
