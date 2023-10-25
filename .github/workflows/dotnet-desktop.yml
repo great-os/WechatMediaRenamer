@@ -90,6 +90,9 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
 
+    - name: Install Third-Party NuGet packages
+      run: nuget restore ${{ env.Solution_Name }}
+
     # Build the Windows Application Packaging project
     - name: Build the Windows Application Packaging Project (wapproj) 
       run: msbuild $env:Solution_Path /p:Platform=$env:TargetPlatform /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:BuildMode /p:AppxBundle=$env:AppxBundle
