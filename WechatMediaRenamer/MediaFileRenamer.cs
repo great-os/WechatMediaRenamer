@@ -76,33 +76,40 @@ namespace WechatMediaRenamer
         private DateTime? GetShotDate()
         {
             DateTime? shotDate = null;
-            IEnumerable<MetadataExtractor.Directory> directories = ImageMetadataReader.ReadMetadata(FullFilePath);
-            Print(directories);
-            foreach (var directory in directories)
+            try
             {
-                if (directory is ExifSubIfdDirectory)
+                IEnumerable<MetadataExtractor.Directory> directories = ImageMetadataReader.ReadMetadata(FullFilePath);
+                Print(directories);
+                foreach (var directory in directories)
                 {
-                    var subIfdDirectory = directory as ExifSubIfdDirectory;
-                    if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeOriginal))
+                    if (directory is ExifSubIfdDirectory)
                     {
-                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTimeOriginal);
-                        break; // Exit the loop since we found the shot date
+                        var subIfdDirectory = directory as ExifSubIfdDirectory;
+                        if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeOriginal))
+                        {
+                            shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTimeOriginal);
+                            break; // Exit the loop since we found the shot date
+                        }
+                        if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeDigitized))
+                        {
+                            shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTime);
+                            break; // Exit the loop since we found the shot date
+                        }
                     }
-                    if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeDigitized))
+                    if (directory is QuickTimeMovieHeaderDirectory)
                     {
-                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTime);
-                        break; // Exit the loop since we found the shot date
+                        var subDirectory = directory as QuickTimeMovieHeaderDirectory;
+                        if (subDirectory.ContainsTag(QuickTimeMovieHeaderDirectory.TagCreated))
+                        {
+                            shotDate = subDirectory.GetDateTime(QuickTimeMovieHeaderDirectory.TagCreated);
+                            break;
+                        }
                     }
                 }
-                if (directory is QuickTimeMovieHeaderDirectory)
-                {
-                    var subDirectory = directory as QuickTimeMovieHeaderDirectory;
-                    if (subDirectory.ContainsTag(QuickTimeMovieHeaderDirectory.TagCreated))
-                    {
-                        shotDate = subDirectory.GetDateTime(QuickTimeMovieHeaderDirectory.TagCreated);
-                        break;
-                    }
-                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogString(ex.Message);
             }
             return shotDate;
         }
