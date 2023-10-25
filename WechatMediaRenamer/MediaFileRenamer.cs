@@ -4,10 +4,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows.Interop;
 using MetadataExtractor;
 using System.Collections.Generic;
 using MetadataExtractor.Formats.Exif;
+using MetadataExtractor.Formats.QuickTime;
 
 namespace WechatMediaRenamer
 {
@@ -77,7 +77,9 @@ namespace WechatMediaRenamer
         {
             DateTime? shotDate = null;
             IEnumerable<MetadataExtractor.Directory> directories = ImageMetadataReader.ReadMetadata(FullFilePath);
+            Print(directories);
             foreach (var directory in directories)
+            {
                 if (directory is ExifSubIfdDirectory)
                 {
                     var subIfdDirectory = directory as ExifSubIfdDirectory;
@@ -88,11 +90,39 @@ namespace WechatMediaRenamer
                     }
                     if (subIfdDirectory.ContainsTag(ExifDirectoryBase.TagDateTimeDigitized))
                     {
-                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTimeDigitized);
+                        shotDate = subIfdDirectory.GetDateTime(ExifDirectoryBase.TagDateTime);
                         break; // Exit the loop since we found the shot date
                     }
                 }
+                if (directory is QuickTimeMovieHeaderDirectory)
+                {
+                    var subDirectory = directory as QuickTimeMovieHeaderDirectory;
+                    if (subDirectory.ContainsTag(QuickTimeMovieHeaderDirectory.TagCreated))
+                    {
+                        shotDate = subDirectory.GetDateTime(QuickTimeMovieHeaderDirectory.TagCreated);
+                        break;
+                    }
+                }
+            }
             return shotDate;
+        }
+
+        // Write all extracted values to stdout
+        static void Print(IEnumerable<MetadataExtractor.Directory> directories)
+        {
+            Console.WriteLine();
+            Console.WriteLine("-------------------------------------------------");
+            Console.WriteLine();
+            foreach (var directory in directories)
+            {
+                Console.WriteLine($"-------{directory.GetType()}-------");
+                foreach (var tag in directory.Tags)
+                {
+                    Console.WriteLine($"{directory.Name} - {tag.Name}({tag.Type}) = {tag.Description}");
+                    Console.WriteLine($" Value: {directory.GetType()}");
+                }
+            }
+
         }
 
         private string _GetDateStringFromProperty(Image image, int propertyId)
