@@ -99,15 +99,27 @@ jobs:
       env:
         AppxBundle: Never
         BuildMode: SideLoadOnly
-        Configuration: Release
+        Configuration: ${{ matrix.configuration }}
         TargetPlatform: ${{ matrix.targetplatform }}
+
+    #Rename
+    - name: Install Third-Party NuGet packages
+      run: Rename-Item -Path "WechatMediaRenamer\bin\${{ matrix.configuration }}\WechatMediaRenamer.exe" -NewName "abc-${{ matrix.configuration }}.exe"
 
     # Upload the exe
     - name: Upload build artifacts
       uses: actions/upload-artifact@v1
+      if: matrix.configuration == 'Release'
       with:
         name: WechatMediaRenamer
         path: WechatMediaRenamer\bin\Release\
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v1
+      if: matrix.configuration == 'Debug'
+      with:
+        name: WechatMediaRenamer
+        path: WechatMediaRenamer\bin\Debug\
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       if: matrix.configuration == 'Release'
@@ -118,3 +130,13 @@ jobs:
         title: "Development Build"
         files: |
           **/WechatMediaRenamer/bin/Release/*
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      if: matrix.configuration == 'Debug'
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+        files: |
+          **/WechatMediaRenamer/bin/Debug/*
