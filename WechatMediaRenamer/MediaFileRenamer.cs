@@ -109,7 +109,8 @@ namespace WechatMediaRenamer
             }
             catch (Exception ex)
             {
-                Logger.LogString(ex.Message);
+                // Logger.LogString(ex.Message);
+                Console.WriteLine(ex.Message);
             }
             return shotDate;
         }
