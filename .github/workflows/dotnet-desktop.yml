@@ -103,8 +103,8 @@ jobs:
         TargetPlatform: ${{ matrix.targetplatform }}
 
     #Rename
-    - name: Install Third-Party NuGet packages
-      run: Rename-Item -Path "WechatMediaRenamer\bin\${{ matrix.configuration }}\WechatMediaRenamer.exe" -NewName "abc-${{ matrix.configuration }}.exe"
+    - name: Rename exe based on configuration
+      run: Rename-Item -Path "WechatMediaRenamer\bin\${{ matrix.configuration }}\WechatMediaRenamer.exe" -NewName "WechatMediaRenamer-${{ matrix.configuration }}.exe"
 
     # Upload the exe
     - name: Upload build artifacts
